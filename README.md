@@ -5,4 +5,10 @@ a repo that holds all the configuration for the kubernetes orchestration system,
 
 ## Setup local environment
 
-WIP
+[install helm](https://helm.sh/docs/intro/install/)
+
+add all helm repos
+```bash
+helm repo add traefik https://helm.traefik.io/traefik
+helm repo update
+```
