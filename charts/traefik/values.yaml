@@ -2,7 +2,7 @@
 image:
   name: traefik
   # defaults to appVersion
-  tag: ""
+  tag: "v2.6"
   pullPolicy: IfNotPresent
 
 #
