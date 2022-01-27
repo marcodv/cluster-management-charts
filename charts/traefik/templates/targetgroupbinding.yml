@@ -1,0 +1,10 @@
+{{- if .Values.targetgroupbinding.enabled }}
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: {{ template "traefik.name" . }}-targetgroupbinding
+  serviceRef:
+    name: {{ template "traefik.name" . }} # route traffic to the awesome-service
+    port: {{ .Values.traefik.ports.traefik.exposedPort }} 
+  targetGroupARN: {{ .Values.targetgroupbinding.targetGroupARN }}
+{{- end }}
