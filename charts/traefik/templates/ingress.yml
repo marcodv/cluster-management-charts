@@ -16,7 +16,8 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ template "traefik.name" . }}
+                # name: {{ template "traefik.name" . }}
+                name: traefik
                 port:
-                  number: {{ .Values.traefik.ports.traefik.exposedPort }} 
+                  number: {{ .Values.traefik.ports.web.exposedPort }} 
 {{- end }}
