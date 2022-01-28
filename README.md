@@ -10,5 +10,22 @@ a repo that holds all the configuration for the kubernetes orchestration system,
 add all helm repos
 ```bash
 helm repo add traefik https://helm.traefik.io/traefik
+helm repo add eks https://aws.github.io/eks-charts
 helm repo update
+```
+
+
+## Setup of new cluster
+
+when dealing with a fresh cluster install the following helm charts 
+
+```bash
+helm install aws-load-balancer-controller ./charts/aws-load-balancer-controller -n kube-system
+helm install --set targetgroupbinding.targetGroupARN=<targetGroupARN> traefik ./charts/traefik -n traefik
+```
+to upgrade them run the following command
+
+```bash
+helm upgrade aws-load-balancer-controller ./charts/aws-load-balancer-controller -n kube-system
+helm upgrade traefik ./charts/traefik -n traefik
 ```
