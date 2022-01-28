@@ -7,8 +7,8 @@ ingress:
 
 targetgroupbinding:
   enabled: true
-  targetGroupARN: setarn
-
+  targetGroupARN: <targetGroupARN> # NOTE : REQUIRED
+ 
 
 traefik:
   # Default values for Traefik
