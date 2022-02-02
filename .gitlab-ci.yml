@@ -1,12 +1,74 @@
-# You can override the included template(s) by including variable overrides
-# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
-# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
-# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
-# Note that environment variables can be set in several places
-# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
-stages:
-- test
-sast:
-  stage: test
 include:
-- template: Security/SAST.gitlab-ci.yml
+  - project: 'noah-energy/noah-pipelines-templates'
+    file:    'variables.yml'
+
+stages:
+- kube-config
+- k8s-pull-secrets
+
+.kube-config-file:
+  stage: kube-config
+  image:    
+    name: amazon/aws-cli
+    entrypoint: [""]
+  variables:
+    AWS_PROFILE: $TF_USER_TEST_ENV
+  script:
+    - aws sts get-caller-identity
+    - aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
+
+    - cp /root/.kube/config kube_config
+    - chmod 777 kube_config
+  artifacts:
+    expose_as: 'kube_config'
+    paths:
+      - kube_config
+  when: manual
+
+kube-config-file-test-cluster:
+  extends: .kube-config-file
+  variables:
+    AWS_REGION: eu-west-1
+    CLUSTER_NAME: eks-test-env
+
+.set-registry-keys:
+  stage: k8s-pull-secrets
+  image: 
+    name: amazon/aws-cli
+    entrypoint: [""]
+  variables:
+    KUBE_CONFIG_FILE: "./kube_config"
+  before_script:
+    - curl -LO https://dl.k8s.io/release/v1.23.0/bin/linux/amd64/kubectl
+    - chmod +x kubectl
+    - mv ./kubectl /usr/bin/kubectl
+  script:
+    # create namespace if it does not exits
+    - kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f - --kubeconfig=$KUBE_CONFIG_FILE
+    # set docker registry-credentials for set namespace 
+    - kubectl create secret docker-registry registry-credentials --docker-server=https://registry.gitlab.com --docker-username=$KUBE_PULL_USER --docker-password=$KUBE_PULL_SECRET --docker-email=$KUBE_PULL_EMAIL -n $NAMESPACE  --dry-run=client -o yaml | kubectl apply -f - --kubeconfig=$KUBE_CONFIG_FILE
+
+  when: manual
+
+set-registry-keys-namespace-development:
+  extends: .set-registry-keys
+  dependencies: 
+    - kube-config-file-test-cluster
+  variables:
+    NAMESPACE: development
+
+
+set-registry-keys-namespace-staging:
+  extends: .set-registry-keys
+  dependencies: 
+    - kube-config-file-test-cluster
+  variables:
+    NAMESPACE: staging
+
+
+set-registry-keys-namespace-production:
+  extends: .set-registry-keys
+  dependencies: 
+    - kube-config-file-test-cluster
+  variables:
+    NAMESPACE: production

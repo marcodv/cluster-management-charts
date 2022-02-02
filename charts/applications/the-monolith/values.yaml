@@ -1,0 +1,191 @@
+# Default values for the-monolith.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: registry.gitlab.com/noah-energy/backend/noah_backend
+  pullPolicy: Always 
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "main"
+
+imagePullSecrets:
+  - name: "registry-credentials"
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+env:
+  - name: POSTGRES_HOST
+    value: postgres
+  - name: POSTGRES_PORT
+    value: "5432"
+  - name: POSTGRES_DB
+    value: noah_backend
+  - name: POSTGRES_USER
+    value: noah_user
+  - name: DJANGO_SETTINGS_MODULE
+    value: config.settings.local
+
+secrets:
+  - name: secret-db-postgres-pass
+    secretName: db-postgres-pass
+    subValues:
+    - mountPath: "/mnt/secret/db-postgres-pass/username"  
+      subPath: username
+      envKeyPath: POSTGRES_USER_FILE
+    - mountPath: "/mnt/secret/db-postgres-pass/password"  
+      subPath: password
+      envKeyPath: POSTGRES_PASSWORD_FILE
+  - name: secret-cache-pass
+    secretName: cache-pass 
+    subValues:
+    - mountPath: "/mnt/secret/cache-pass/cache_url"  
+      subPath: cache_url
+      envKeyPath: CACHE_REDIS_URL_FILE
+  - name: secret-celery-broker-pass
+    secretName: celery-broker-pass 
+    subValues:
+    - mountPath: "/mnt/secret/celery-broker-pass/broker_url"
+      subPath: broker_url
+      envKeyPath: CELERY_BROKER_URL_FILE
+    - mountPath: "/mnt/secret/celery-broker-pass/broker_result_url"  
+      subPath: broker_result_url
+      envKeyPath: CELERY_BROKER_BACKEND_FILE
+  - name: secret-jwt-rsa-keys
+    secretName: jwt-rsa-keys 
+    subValues:
+    - mountPath: "/mnt/secret/jwt-rsa-keys/key"  
+      subPath: key
+      envKeyPath: JWT_RSA_KEY_PRIVATE_FILE
+    - mountPath: "/mnt/secret/jwt-rsa-keys/pub"  
+      subPath: pub
+      envKeyPath: JWT_RSA_KEY_PUBLIC_FILE
+
+collectstaticJob:
+  enabled: true
+
+migrateJob:
+  enabled: true
+
+djangoServer:
+
+  enabled: true
+  name: "django-server"
+
+  command:
+    - "commands/entrypoint.sh"
+  args:
+    - "commands/celery.sh"
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  resources: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
+
+
+djangoWorker:
+
+  enabled: true
+  name: "django-worker"
+
+  command:
+    - "commands/entrypoint.sh"
+  args:
+    - "commands/celery.sh"
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+
+  securityContext: {}
+
+  resources: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
+
+
+djangoWorkerBeat:
+
+  enabled: true
+  name: "django-worker-beat"
+
+  command:
+    - "commands/entrypoint.sh"
+  args:
+    - "commands/celerybeat.sh"
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+
+  securityContext: {}
+
+  resources: {}
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
