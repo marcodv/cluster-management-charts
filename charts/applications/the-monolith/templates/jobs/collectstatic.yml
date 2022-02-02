@@ -1,0 +1,57 @@
+{{- if .Values.collectstaticJob.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{.Release.Name}}-job-collectstatic
+  labels:
+    {{- include "the-monolith.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collectstatic-job
+spec:
+  template:
+    #    ttlSecondsAfterFinished: 60
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.djangoServer.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python",  "manage.py", "collectstatic"]
+
+          env:
+          {{- range $secretMount := .Values.secrets }}
+          {{- range $secretMountSubValues := $secretMount.subValues }}
+            - name: {{ $secretMountSubValues.envKeyPath | quote }}
+              value:  {{ $secretMountSubValues.mountPath | quote}}
+          {{- end }}
+          {{- end }}
+          {{- range $envVar := .Values.env }}
+            - name: {{ $envVar.name | quote}}
+              value:  {{ $envVar.value | quote}}
+          {{- end }}
+
+          volumeMounts:
+          {{- range $secretMount := .Values.secrets }}
+          {{- range $secretMountSubValues := $secretMount.subValues }}
+            - name: {{ $secretMount.name }}
+              mountPath:  {{ $secretMountSubValues.mountPath }}
+              subPath: {{ $secretMountSubValues.subPath }}
+          {{- end }}
+          {{- end }}
+
+      volumes:
+        {{- range $secretVolume := .Values.secrets }}
+        - name: {{ $secretVolume.name }}
+          secret:
+            secretName:  {{ $secretVolume.secretName }}
+        {{- end }}
+
+
+      restartPolicy: Never
+  backoffLimit: 0
+{{- end -}}
+

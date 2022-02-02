@@ -1,0 +1,114 @@
+{{- if .Values.djangoServer.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.djangoServer.name }}
+  labels:
+    {{- include "the-monolith.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ .Values.djangoServer.name }}
+spec:
+  {{- if not .Values.djangoServer.autoscaling.enabled }}
+  replicas: {{ .Values.djangoServer.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "the-monolith.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ .Values.djangoServer.name }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "the-monolith.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ .Values.djangoServer.name }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "the-monolith.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.djangoServer.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-{{ .Values.djangoServer.name }}
+          securityContext:
+            {{- toYaml .Values.djangoServer.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+
+          {{- if .Values.djangoServer.livenessProbe.enabled  }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- end}}
+
+          {{- if .Values.djangoServer.readinessProbe.enabled  }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- end}}
+
+          {{- with .Values.djangoServer.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+
+          {{- with .Values.djangoServer.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          resources:
+            {{- toYaml .Values.djangoServer.resources | nindent 12 }}
+
+
+          env:
+          {{- range $secretMount := .Values.secrets }}
+          {{- range $secretMountSubValues := $secretMount.subValues }}
+            - name: {{ $secretMountSubValues.envKeyPath | quote }}
+              value:  {{ $secretMountSubValues.mountPath | quote}}
+          {{- end }}
+          {{- end }}
+          {{- range $envVar := .Values.env }}
+            - name: {{ $envVar.name | quote}}
+              value:  {{ $envVar.value | quote}}
+          {{- end }}
+
+          volumeMounts:
+          {{- range $secretMount := .Values.secrets }}
+          {{- range $secretMountSubValues := $secretMount.subValues }}
+            - name: {{ $secretMount.name }}
+              mountPath:  {{ $secretMountSubValues.mountPath }}
+              subPath: {{ $secretMountSubValues.subPath }}
+          {{- end }}
+          {{- end }}
+
+      volumes:
+        {{- range $secretVolume := .Values.secrets }}
+        - name: {{ $secretVolume.name }}
+          secret:
+            secretName:  {{ $secretVolume.secretName }}
+        {{- end }}
+
+      {{- with .Values.djangoServer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.djangoServer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.djangoServer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
