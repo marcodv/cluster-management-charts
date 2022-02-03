@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "the-monolith.fullname" . }}
+  name: {{ .Values.djangoServer.name }}
   labels:
     {{- include "the-monolith.labels" . | nindent 4 }}
     app.kubernetes.io/component: {{ .Values.djangoServer.name }}
@@ -9,9 +9,9 @@ spec:
   type: {{ .Values.djangoServer.service.type }}
   ports:
     - port: {{ .Values.djangoServer.service.port }}
-      targetPort: http
+      targetPort: 8000
       protocol: TCP
-      name: http
+      name: django-server
   selector:
     {{- include "the-monolith.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: {{ .Values.djangoServer.name }}

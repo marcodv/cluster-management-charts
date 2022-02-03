@@ -26,7 +26,7 @@ serviceAccount:
 
 env:
   - name: POSTGRES_HOST
-    value: postgres
+    value: postgresql
   - name: POSTGRES_PORT
     value: "5432"
   - name: POSTGRES_DB
@@ -38,13 +38,10 @@ env:
 
 secrets:
   - name: secret-db-postgres-pass
-    secretName: db-postgres-pass
+    secretName: postgresql-pass
     subValues:
-    - mountPath: "/mnt/secret/db-postgres-pass/username"  
-      subPath: username
-      envKeyPath: POSTGRES_USER_FILE
-    - mountPath: "/mnt/secret/db-postgres-pass/password"  
-      subPath: password
+    - mountPath: "/mnt/secret/postgresql-pass/password"  
+      subPath: postgresql-postgres-password
       envKeyPath: POSTGRES_PASSWORD_FILE
   - name: secret-cache-pass
     secretName: cache-pass 
@@ -85,7 +82,7 @@ djangoServer:
   command:
     - "commands/entrypoint.sh"
   args:
-    - "commands/celery.sh"
+    - "commands/gunicorn.sh"
 
   podAnnotations: {}
 
@@ -103,6 +100,10 @@ djangoServer:
   service:
     type: ClusterIP
     port: 8000
+
+  ingressRoute:
+    enabled: true
+    pathPrefix: "/api"
 
   resources: {}
 

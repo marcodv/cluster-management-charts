@@ -1,0 +1,18 @@
+{{- if .Values.djangoServer.ingressRoute.enabled -}}
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: djangoingressroute
+spec:
+  entryPoints:
+    - web
+
+  routes:
+  - match:  PathPrefix(`{{ .Values.djangoServer.ingressRoute.pathPrefix }}`)
+    kind: Rule
+    services:
+    - name: {{ .Values.djangoServer.name }}
+      port: 8000
+
+{{- end }}
