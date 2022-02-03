@@ -11,6 +11,7 @@ add all helm repos
 ```bash
 helm repo add traefik https://helm.traefik.io/traefik
 helm repo add eks https://aws.github.io/eks-charts
+helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 ```
 
@@ -36,18 +37,18 @@ helm upgrade traefik ./charts/traefik -n traefik
 when using dvelopment in a local cluster we need to create the secrets manually.
 
 ```bash
-kubectl create secret generic db-postgres-pass \
-  --from-literal=username='devpostgresuser' \
-  --from-literal=password='changepasswordinprod' \
+kubectl create secret generic postgresql-pass \
+  --from-literal=postgresql-postgres-password='changepasswordinprod' \
   -n dev
 
 kubectl create secret generic cache-pass \
-  --from-literal=cache_url='redis://redis:6379/0' \
+  --from-literal=cache_url='redis://redis-master:6379/0' \
   -n dev
 
 kubectl create secret generic celery-broker-pass \
-  --from-literal=broker_url='amqp://rabbitmq:5672' \
-  --from-literal=broker_result_url='redis://redis:6379/1' \
+  --from-literal=rabbitmq-password='rabbitmppasschangeinprod' \
+  --from-literal=broker_url='amqp://django_user:rabbitmppasschangeinprod@rabbitmq:5672' \
+  --from-literal=broker_result_url='redis://redis-master:6379/1' \
   -n dev
 
 openssl genrsa -out jwt-key 4096
