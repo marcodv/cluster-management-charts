@@ -57,7 +57,7 @@ secrets:
       envKeyPath: CELERY_BROKER_URL_FILE
     - mountPath: "/mnt/secret/celery-broker-pass/broker_result_url"  
       subPath: broker_result_url
-      envKeyPath: CELERY_BROKER_BACKEND_FILE
+      envKeyPath: CELERY_RESULT_BACKEND_FILE
   - name: secret-jwt-rsa-keys
     secretName: jwt-rsa-keys 
     subValues:
@@ -121,10 +121,9 @@ djangoServer:
   affinity: {}
 
   livenessProbe:
-    enabled: false
+    enabled: true
   readinessProbe:
-    enabled: false
-
+    enabled: true
 
 djangoWorker:
 
@@ -157,10 +156,9 @@ djangoWorker:
   affinity: {}
 
   livenessProbe:
-    enabled: false
+    enabled: true
   readinessProbe:
-    enabled: false
-
+    enabled: true
 
 djangoWorkerBeat:
 
@@ -187,6 +185,6 @@ djangoWorkerBeat:
   affinity: {}
 
   livenessProbe:
-    enabled: false
+    enabled: true
   readinessProbe:
     enabled: false

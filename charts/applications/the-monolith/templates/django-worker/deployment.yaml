@@ -41,23 +41,21 @@ spec:
           {{- if .Values.djangoWorker.livenessProbe.enabled  }}
           livenessProbe:
             exec:
-            # bash is needed to replace the environment variable
-            command: [
-              "bash",
-              "-c",
-              "celery inspect ping -A apps -d celery@$HOSTNAME"
-            ]
+              command: [
+                "/usr/local/bin/python",
+                "-c",
+                "\"import os;from celery.task.control import inspect;from config.celery_app import celery_app;exit(0 if os.environ['HOSTNAME'] in ','.join(inspect(app=celery_app).stats().keys()) else 1)\""
+              ]
           {{- end}}
 
           {{- if .Values.djangoWorker.readinessProbe.enabled  }}
           readinessProbe:
             exec:
-            # bash is needed to replace the environment variable
-            command: [
-              "bash",
-              "-c",
-              "celery inspect ping -A apps -d celery@$HOSTNAME"
-            ]
+              command: [
+                "/usr/local/bin/python",
+                "-c",
+                "\"import os;from celery.task.control import inspect;from config.celery_app import celery_app;exit(0 if os.environ['HOSTNAME'] in ','.join(inspect(app=celery_app).stats().keys()) else 1)\""
+              ]
           {{- end}}
 
           {{- with .Values.djangoWorker.command }}
