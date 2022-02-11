@@ -6,7 +6,7 @@ ingress:
     # alb.ingress.kubernetes.io/group.name: traefik/traefik-ingress 
 
 targetgroupbinding:
-  enabled: true
+  enabled: false
   targetGroupARN: <targetGroupARN> # NOTE : REQUIRED
  
 
