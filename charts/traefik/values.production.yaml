@@ -1,0 +1,5 @@
+ingress:
+  annotations:
+    alb.ingress.kubernetes.io/tags: Environment=prod
+    external-dns.alpha.kubernetes.io/hostname: app.noah.energy
+  clusterName: eks-prod-env

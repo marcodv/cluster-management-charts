@@ -1,0 +1,4 @@
+
+aws-load-balancer-controller:
+  clusterName: eks-prod-env
+  logLevel: info

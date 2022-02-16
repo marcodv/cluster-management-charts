@@ -1,0 +1,296 @@
+
+
+external-dns:
+  ## @param sources [array] K8s resources type to be observed for new DNS entries by ExternalDNS
+  ##
+  sources:
+    # - crd
+    - service
+    - ingress
+    # - contour-httpproxy
+
+  ## @param provider DNS provider where the DNS records will be created.
+  ## Available providers are:
+  ## - alibabacloud, aws, azure, azure-private-dns, cloudflare, coredns, designate, digitalocean, google, hetzner, infoblox, linode, rfc2136, transip
+  ##
+  provider: aws
+
+  ## AWS configuration to be set via arguments/env. variables
+  ##
+  aws:
+    ## AWS credentials
+    ## @param aws.credentials.secretKey When using the AWS provider, set `aws_secret_access_key` in the AWS credentials (optional)
+    ## @param aws.credentials.accessKey When using the AWS provider, set `aws_access_key_id` in the AWS credentials (optional)
+    ## @param aws.credentials.mountPath When using the AWS provider, determine `mountPath` for `credentials` secret
+    ##
+    credentials:
+      secretKey: ""
+      accessKey: ""
+      ## Before external-dns 0.5.9 home dir should be `/root/.aws`
+      ##
+      mountPath: "/.aws"
+      ## @param aws.credentials.secretName Use an existing secret with key "credentials" defined.
+      ## This ignores aws.credentials.secretKey, and aws.credentials.accessKey
+      ##
+      secretName: ""
+    ## @param aws.region When using the AWS provider, `AWS_DEFAULT_REGION` to set in the environment (optional)
+    ##
+    region: "eu-west-1"
+    ## @param aws.zoneType When using the AWS provider, filter for zones of this type (optional, options: public, private)
+    ##
+    zoneType: ""
+    ## @param aws.assumeRoleArn When using the AWS provider, assume role by specifying --aws-assume-role to the external-dns daemon
+    ##
+    assumeRoleArn: ""
+    ## @param aws.roleArn Specify role ARN to the external-dns daemon
+    ##
+    roleArn: ""
+    ## @param aws.apiRetries Maximum number of retries for AWS API calls before giving up
+    ##
+    apiRetries: 3
+    ## @param aws.batchChangeSize When using the AWS provider, set the maximum number of changes that will be applied in each batch
+    ##
+    batchChangeSize: 1000
+    ## @param aws.zoneTags When using the AWS provider, filter for zones with these tags
+    ##
+    zoneTags: []
+    ## @param aws.preferCNAME When using the AWS provider, replaces Alias records with CNAME (options: true, false)
+    ##
+    preferCNAME: ""
+    ## @param aws.evaluateTargetHealth When using the AWS provider, sets the evaluate target health flag (options: true, false)
+    ##
+    evaluateTargetHealth: ""
+  ## @param domainFilters Limit possible target zones by domain suffixes (optional)
+  ##
+
+  ##
+  crd:
+    ## @param crd.create Install and use the integrated DNSEndpoint CRD
+    ##
+    create: false
+    ## @param crd.apiversion Sets the API version for the CRD to watch
+    ##
+    apiversion: ""
+    ## @param crd.kind Sets the kind for the CRD to watch
+    ##
+    kind: ""
+  ## Kubernetes svc configutarion
+  ##
+  service:
+    ## @param service.enabled Whether to create Service resource or not
+    ##
+    enabled: true
+    ## @param service.type Kubernetes Service type
+    ##
+    type: ClusterIP
+    ## @param service.ports.http ExternalDNS client port
+    ##
+    ports:
+      http: 7979
+    ## @param service.nodePorts.http Port to bind to for NodePort service type (client port)
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+    ##
+    nodePorts:
+      http: ""
+    ## @param service.clusterIP IP address to assign to service
+    ##
+    clusterIP: ""
+    ## @param service.externalIPs Service external IP addresses
+    ##
+    externalIPs: []
+    ## @param service.loadBalancerIP IP address to assign to load balancer (if supported)
+    ##
+    loadBalancerIP: ""
+    ## @param service.loadBalancerSourceRanges List of IP CIDRs allowed access to load balancer (if supported)
+    ##
+    loadBalancerSourceRanges: []
+    ## @param service.externalTrafficPolicy Enable client source IP preservation
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param service.extraPorts Extra ports to expose in the service (normally used with the `sidecar` value)
+    ##
+    extraPorts: []
+    ## @param service.annotations Annotations to add to service
+    ## set the LoadBalancer service type to internal only.
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+    ##
+    annotations: {}
+    ## @param service.labels Provide any additional labels which may be required.
+    ## This can be used to have external-dns show up in `kubectl cluster-info`
+    ##  kubernetes.io/cluster-service: "true"
+    ##  kubernetes.io/name: "external-dns"
+    ##
+    labels: {}
+  ## ServiceAccount parameters
+  ## https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param serviceAccount.create Determine whether a Service Account should be created or it should reuse a exiting one.
+    ##
+    create: true
+    ## @param serviceAccount.name ServiceAccount to use. A name is generated using the external-dns.fullname template if it is not set
+    ##
+    name: ""
+    ## @param serviceAccount.annotations Additional Service Account annotations
+    ##
+    annotations: {}
+    ## @param serviceAccount.automountServiceAccountToken Automount API credentials for a service account.
+    ##
+    automountServiceAccountToken: true
+  ## RBAC parameters
+  ## https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ##
+  rbac:
+    ## @param rbac.create Whether to create & use RBAC resources or not
+    ##
+    create: true
+    ## @param rbac.clusterRole Whether to create Cluster Role. When set to false creates a Role in `namespace`
+    ##
+    clusterRole: true
+    ## @param rbac.apiVersion Version of the RBAC API
+    ##
+    apiVersion: v1
+    ## @param rbac.pspEnabled Whether to create a PodSecurityPolicy. WARNING: PodSecurityPolicy is deprecated in Kubernetes v1.21 or later, unavailable in v1.25 or later
+    ##
+    pspEnabled: false
+  ## @param containerSecurityContext Security context for the container
+  ## https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ## Example:
+  ## securityContext:
+  ##   allowPrivilegeEscalation: false
+  ##   readOnlyRootFilesystem: true
+  ##   capabilities:
+  ##     drop: ["ALL"]
+  ##
+  containerSecurityContext: {}
+  ## @param podSecurityContext.enabled Enable pod security context
+  ## @param podSecurityContext.fsGroup Group ID for the container
+  ## @param podSecurityContext.runAsUser User ID for the container
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+    runAsUser: 1001
+  ## Container resource requests and limits
+  ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ## We usually recommend not to specify default resources and to leave this as a conscious
+  ## choice for the user. This also increases chances charts run on environments with little
+  ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+  ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  ## @param resources.limits The resources limits for the container
+  ## @param resources.requests The requested resources for the container
+  ##
+  resources:
+    ## Example:
+    ## limits:
+    ##    cpu: 50m
+    ##    memory: 50Mi
+    ##
+    limits: {}
+    ## Examples:
+    ## requests:
+    ##    cpu: 10m
+    ##    memory: 50Mi
+    ##
+    requests: {}
+  ## Configure extra options for liveness probe
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param livenessProbe.enabled Enable livenessProbe
+  ## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  ## Configure extra options for readiness probe
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param readinessProbe.enabled Enable readinessProbe
+  ## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  ## Configure extra options for startup probe
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-startup-probes/#configure-probes
+  ## @param startupProbe.enabled Enable startupProbe
+  ## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+
+  ## Prometheus Exporter / Metrics
+  ##
+  metrics:
+    ## @param metrics.enabled Enable prometheus to access external-dns metrics endpoint
+    ##
+    enabled: false
+    ## @param metrics.podAnnotations Annotations for enabling prometheus to access the metrics endpoint
+    ##
+    podAnnotations: {}
+    ## Prometheus Operator ServiceMonitor configuration
+    ##
+    serviceMonitor:
+      ## @param metrics.serviceMonitor.enabled Create ServiceMonitor object
+      ##
+      enabled: false
+      ## @param metrics.serviceMonitor.namespace Namespace in which Prometheus is running
+      ##
+      namespace: ""
+      ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ##
+      interval: ""
+      ## @param metrics.serviceMonitor.scrapeTimeout Timeout after which the scrape is ended
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ##
+      scrapeTimeout: ""
+      ## @param metrics.serviceMonitor.selector Additional labels for ServiceMonitor object
+      ## ref: https://github.com/bitnami/charts/tree/master/bitnami/prometheus-operator#prometheus-configuration
+      ## e.g:
+      ## selector:
+      ##   prometheus: my-prometheus
+      ##
+      selector: {}
+      ## @param metrics.serviceMonitor.metricRelabelings Specify Metric Relabelings to add to the scrape endpoint
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
+      ##
+      metricRelabelings: []
+      ## @param metrics.serviceMonitor.relabelings [array] Prometheus relabeling rules
+      ##
+      relabelings: []
+      ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+      ##
+      honorLabels: false
+      ## @param metrics.serviceMonitor.additionalLabels Used to pass Labels that are required by the installed Prometheus Operator
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#prometheusspec
+      ##
+      additionalLabels: {}
+      ## @param metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in prometheus.
+      ##
+      jobLabel: ""
+
