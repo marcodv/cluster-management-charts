@@ -1,0 +1,4 @@
+aws-load-balancer-controller:
+  replicaCount: 1
+  clusterName: eks-dev-env
+  logLevel: debug
