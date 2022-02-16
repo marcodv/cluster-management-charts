@@ -31,4 +31,15 @@ helm upgrade aws-load-balancer-controller ./charts/aws-load-balancer-controller 
 helm upgrade traefik ./charts/traefik -n traefik
 ```
 
+## Release
+
+To release the charts a cicd pipeline will be triggered.
+
+### Release development
+
+by merging a branch back to main we trigger the pipeline to deploy
+
+### Release production
+
+by merging a branch back to production we trigger the pipeline to deploy
 
