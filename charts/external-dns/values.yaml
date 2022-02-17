@@ -4,10 +4,13 @@ external-dns:
   ## @param sources [array] K8s resources type to be observed for new DNS entries by ExternalDNS
   ##
   sources:
-    # - crd
+    - crd
     - service
     - ingress
     # - contour-httpproxy
+
+
+  policy: sync # auto cleanup old dns records
 
   ## @param provider DNS provider where the DNS records will be created.
   ## Available providers are:
@@ -63,11 +66,12 @@ external-dns:
   ## @param domainFilters Limit possible target zones by domain suffixes (optional)
   ##
 
+
   ##
   crd:
     ## @param crd.create Install and use the integrated DNSEndpoint CRD
     ##
-    create: false
+    create: true
     ## @param crd.apiversion Sets the API version for the CRD to watch
     ##
     apiversion: ""

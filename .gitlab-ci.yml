@@ -37,7 +37,7 @@ install-aws-load-balancer-controller:development-cluster:
   rules: 
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
-        - "./charts/aws-load-balancer-controller/*"
+        - charts/aws-load-balancer-controller/**/*
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED 
 
 
@@ -51,7 +51,7 @@ install-aws-load-balancer-controller:production-cluster:
   rules: 
     - if: $CI_COMMIT_BRANCH == "production"
       changes:
-        - "./charts/aws-load-balancer-controller/*"
+        - charts/aws-load-balancer-controller/**/*
     - if: $CI_COMMIT_BRANCH == "production" && $CI_PIPELINE_TRIGGERED
 
 .install-external-dns:
@@ -72,7 +72,7 @@ install-external-dns:development-cluster:
   rules: 
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
-        - "./charts/external-dns/*"
+        - charts/external-dns/**/*
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED 
 
 
@@ -85,7 +85,7 @@ install-external-dns:production-cluster:
   rules: 
     - if: $CI_COMMIT_BRANCH == "production"
       changes:
-        - "./charts/external-dns/*"
+        - charts/external-dns/**/*
     - if: $CI_COMMIT_BRANCH == "production" && $CI_PIPELINE_TRIGGERED
 
 .install-traefik:
@@ -112,7 +112,7 @@ install-traefik:development-cluster:
   rules: 
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
-        - "./charts/traefik/*"
+        - charts/traefik/**/*
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED
 
 
@@ -130,5 +130,5 @@ install-traefik:production-cluster:
   rules: 
     - if: $CI_COMMIT_BRANCH == "production"
       changes:
-        - "./charts/traefik/*"
+        - charts/traefik/**/*
     - if: $CI_COMMIT_BRANCH == "production" && $CI_PIPELINE_TRIGGERED
