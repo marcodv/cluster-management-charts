@@ -100,10 +100,6 @@ install-external-dns:production-cluster:
 
 install-traefik:development-cluster:
   extends: .install-traefik
-  needs: [
-    "install-aws-load-balancer-controller:development-cluster",
-    "install-external-dns:development-cluster",
-  ]
   variables:
     AWS_REGION: eu-west-1
     CLUSTER_NAME: eks-dev-env
@@ -118,10 +114,6 @@ install-traefik:development-cluster:
 
 install-traefik:production-cluster:
   extends: .install-traefik
-  needs: [
-    "install-aws-load-balancer-controller:production-cluster",
-    "install-external-dns:production-cluster",
-  ]
   variables:
     AWS_REGION: eu-west-1
     CLUSTER_NAME: eks-prod-env
