@@ -10,6 +10,9 @@ external-dns:
     # - contour-httpproxy
 
 
+  ## @param txtPrefix When using the TXT registry, a prefix for ownership records that avoids collision with CNAME entries (optional)<CNAME record> (Mutual exclusive with txt-suffix)
+  ##
+  txtPrefix: "prefix.donotclashwithcname."
   policy: sync # auto cleanup old dns records
 
   ## @param provider DNS provider where the DNS records will be created.
@@ -59,7 +62,7 @@ external-dns:
     zoneTags: []
     ## @param aws.preferCNAME When using the AWS provider, replaces Alias records with CNAME (options: true, false)
     ##
-    preferCNAME: ""
+    preferCNAME: "true"
     ## @param aws.evaluateTargetHealth When using the AWS provider, sets the evaluate target health flag (options: true, false)
     ##
     evaluateTargetHealth: ""

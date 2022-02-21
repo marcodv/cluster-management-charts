@@ -1,13 +1,24 @@
 ingress:
   enabled: true
+  # enabled: false
   annotations:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
+
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:848481299679:certificate/74d36e22-cc38-49eb-b07d-43437e2e21b8
+    # alb.ingress.kubernetes.io/ssl-redirect: '443'
+
+    # alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    # alb.ingress.kubernetes.io/healthcheck-path: /ping
+    # alb.ingress.kubernetes.io/healthcheck-port: '80'
+
     alb.ingress.kubernetes.io/tags: 
   clusterName: 
 
 whoami:
-  enabled: false
+  enabled: true
+  # enabled: false
 
 traefik:
   # Default values for Traefik
