@@ -5,6 +5,7 @@ include:
 stages:
 - setup
 - networking
+- monitoring
 
 .connect-to-cluster:
   image: 
@@ -123,4 +124,45 @@ install-traefik:production-cluster:
     - if: $CI_COMMIT_BRANCH == "production"
       changes:
         - charts/traefik/**/*
+    - if: $CI_COMMIT_BRANCH == "production" && $CI_PIPELINE_TRIGGERED
+
+.install-monitoring:
+  stage: monitoring
+  extends: .connect-to-cluster 
+  script: 
+    - |
+      helm upgrade --install monitoring \
+        ./charts/monitoring \
+        -f ${ENVIRONMENT_VALUES} \
+        --set grafana.adminPassword=${GRAFANA_PASSWORD} \
+        # -n monitoring --create-namespace
+        -n test-monitoring --create-namespace
+
+install-monitoring:development-cluster:
+  extends: .install-monitoring
+  variables:
+    AWS_REGION: eu-west-1
+    CLUSTER_NAME: eks-dev-env
+    AWS_PROFILE: $TF_USER_DEV_ENV
+    ENVIRONMENT_VALUES: ./charts/monitoring/values.development.yaml 
+    GRAFANA_PASSWORD: $GRAFANA_PASSWORD_DEV_ENV
+  rules: 
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - charts/monitoring/**/*
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED
+
+
+install-monitoring:production-cluster:
+  extends: .install-monitoring
+  variables:
+    AWS_REGION: eu-west-1
+    CLUSTER_NAME: eks-prod-env
+    AWS_PROFILE: $TF_USER_PROD_ENV
+    GRAFANA_PASSWORD: $GRAFANA_PASSWORD_PROD_ENV
+    ENVIRONMENT_VALUES: ./charts/monitoring/values.production.yaml
+  rules: 
+    - if: $CI_COMMIT_BRANCH == "production"
+      changes:
+        - charts/monitoring/**/*
     - if: $CI_COMMIT_BRANCH == "production" && $CI_PIPELINE_TRIGGERED

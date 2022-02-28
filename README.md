@@ -12,6 +12,7 @@ add all helm repos
 helm repo add traefik https://helm.traefik.io/traefik
 helm repo add eks https://aws.github.io/eks-charts
 helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 ```
 
@@ -21,14 +22,24 @@ helm repo update
 when dealing with a fresh cluster install the following helm charts 
 
 ```bash
-helm install aws-load-balancer-controller ./charts/aws-load-balancer-controller -n kube-system
-helm install --set targetgroupbinding.targetGroupARN=<targetGroupARN> traefik ./charts/traefik -n traefik
-```
-to upgrade them run the following command
+helm upgrade --install aws-load-balancer-controller \
+    ./charts/aws-load-balancer-controller \
+    -f ./charts/aws-load-balancer-controller/values.${cluster_environment}.yaml \
+    -n kube-system
 
-```bash
-helm upgrade aws-load-balancer-controller ./charts/aws-load-balancer-controller -n kube-system
-helm upgrade traefik ./charts/traefik -n traefik
+helm upgrade --install external-dns \
+    ./charts/external-dns \
+    -n kube-system
+
+helm upgrade --install traefik \
+    ./charts/traefik \
+    -f ./charts/traefik/values.${cluster_environment}.yaml \
+    -n traefik
+
+helm upgrade --install monitoring \
+    ./charts/monitoring \
+    -f ./charts/monitoring/values.${cluster_environment}.yaml \
+    -n monitoring
 ```
 
 ## Release
