@@ -175,6 +175,7 @@ grafana:
 
 
 prometheus:
+  namespaceOverride: monitoring
   resources:
     limits:
       cpu: 200m
