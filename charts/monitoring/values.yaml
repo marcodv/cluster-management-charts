@@ -123,6 +123,12 @@ grafana:
           url: http://monitoring-prometheus-server.monitoring.svc.cluster.local
           access: proxy
           isDefault: true
+        - name: CloudWatch
+          type: cloudwatch
+          jsonData:
+            defaultRegion: eu-west-1
+            authType: default
+            assumeRoleArn: 
 
   dashboardProviders:
     dashboardproviders.yaml:

@@ -1,2 +1,3 @@
 grafana:
   adminUser: grafana-prod-env-noah
+  assumeRoleArn: arn:aws:iam::848481299679:role/grafanaRoleprodEnv
