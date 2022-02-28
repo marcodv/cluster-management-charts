@@ -135,8 +135,7 @@ install-traefik:production-cluster:
         ./charts/monitoring \
         -f ${ENVIRONMENT_VALUES} \
         --set grafana.adminPassword=${GRAFANA_PASSWORD} \
-        # -n monitoring --create-namespace
-        -n test-monitoring --create-namespace
+        -n monitoring --create-namespace
 
 install-monitoring:development-cluster:
   extends: .install-monitoring
