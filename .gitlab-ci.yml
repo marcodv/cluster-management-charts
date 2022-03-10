@@ -153,7 +153,6 @@ install-monitoring:development-cluster:
       changes:
         - charts/monitoring/**/*
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED
-    - if: $CI_COMMIT_BRANCH == "14-create-grafana-folder-structure"
 
 install-monitoring:production-cluster:
   extends: .install-monitoring
