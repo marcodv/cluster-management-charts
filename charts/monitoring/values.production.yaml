@@ -1,3 +1,9 @@
 grafana:
-  adminUser: grafana-prod-env-noah
+  admin:
+    user: grafana-prod-env-noah
+    password: Marcotesting123
+  datasources:
+    secretName: prometheus-datasource
   assumeRoleArn: arn:aws:iam::848481299679:role/grafanaRoleprodEnv
+  dashboardsProvider:
+    configMapName: default
