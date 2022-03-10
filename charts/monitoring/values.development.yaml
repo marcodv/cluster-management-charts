@@ -1,7 +1,4 @@
 grafana:
-  admin:
-    user: grafana-dev-env-noah
-    password: Marcotesting123
   datasources:
     secretName: prometheus-datasource
   dashboardsProvider:
