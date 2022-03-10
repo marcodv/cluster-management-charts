@@ -16,8 +16,10 @@ grafana:
   replicas: 1
 
   # Administrator credentials when not using an existing secret (see below)
-  adminUser:
-  adminPassword:
+  admin:
+    user: 
+    #assumeRoleArn: arn:aws:iam::848481299679:role/grafanaRoledevEnv
+    password: 
 
   ## See `kubectl explain deployment.spec.strategy` for more
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
@@ -37,27 +39,6 @@ grafana:
     timeoutSeconds: 30
     failureThreshold: 10
 
-  downloadDashboardsImage:
-    repository: curlimages/curl
-    tag: 7.70.0
-    sha: ""
-    pullPolicy: IfNotPresent
-
-  downloadDashboards:
-    env: {}
-    resources: {}
-
-  podLabels:
-    app: grafana
-
-  podPortName: grafana
-
-  ## Security context for Grafana to run
-  securityContext:
-    runAsUser: 472
-    runAsGroup: 472
-    fsGroup: 472
-
   ## Expose the grafana service to be accessed from outside the cluster (LoadBalancer service).
   ## or access it from within the cluster (ClusterIP service). Set the service type and the port to serve it.
   ## ref: http://kubernetes.io/docs/user-guide/services/
@@ -72,35 +53,28 @@ grafana:
       app: grafana
     portName: service
 
-  ## This allows the prometheus-server to be run with an arbitrary user
-  ##
-  initChownData:
-    enabled: true
-    ## initChownData container image
-    ##
-    image:
-      repository: busybox
-      tag: "1.31.1"
-      sha: ""
-      pullPolicy: IfNotPresent
+  datasources:
+    secretName:
 
-  ## Grafana's primary configuration
-  ## NOTE: values in map will be converted to ini format
-  ## ref: http://docs.grafana.org/installation/configuration/
-  ##
-  grafana.ini:
-    paths:
-      data: /var/lib/grafana/data
-      logs: /var/log/grafana
-      plugins: /var/lib/grafana/plugins
-      provisioning: /etc/grafana/provisioning
-    analytics:
-      check_for_updates: true
-    log:
-      mode: console
-    grafana_net:
-      url:
-        https://grafana.com
+  dashboardsProvider:
+    enabled: true
+    configMapName:
+  
+  dashboardsConfigMaps: 
+    - configMapName: cluster-resources
+      fileName: cluster-resources.json
+    - configMapName: traefik
+      fileName: traefik.json
+    - configMapName: rabbitmq
+      fileName: rabbitmq.json
+    - configMapName: eks-volumes
+      fileName: eks-volumes.json
+
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 20Gi
 
   ## Grafana container limits resources
   resources:
@@ -110,69 +84,6 @@ grafana:
     requests:
       cpu: 100m
       memory: 128Mi
-
-  ## Configure grafana datasources
-  ## ref: http://docs.grafana.org/administration/provisioning/#datasources
-  ##
-  datasources:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
-        - name: Prometheus
-          type: prometheus
-          url: http://monitoring-prometheus-server.monitoring.svc.cluster.local
-          access: proxy
-          isDefault: true
-
-  dashboardProviders:
-    dashboardproviders.yaml:
-      apiVersion: 1
-      providers:
-        - name: default
-          orgId: 1
-          folder: 
-          type: file
-          disableDeletion: true
-          editable: true
-          options:
-            path: /var/lib/grafana/dashboards/default
-
-  dashboards:
-    default:
-      prometheus-stats:
-        gnetId: 10000
-        revision: 1
-        datasource: Prometheus
-      cluster-metrics:
-        gnetId: 6417
-        revision: 1
-        datasource: Prometheus
-      persistent-volumes:
-        gnetId: 6739
-        revision: 1
-        datasource: Prometheus
-      traefik:
-        gnetId: 4475
-        revision: 5
-        datasource: Prometheus
-
-  ## Plugins to install
-  plugins:
-    - digrich-bubblechart-panel
-    - grafana-clock-panel
-    - redis-datasource
-    - grafana-piechart-panel
-
-  persistence:
-    type: pvc
-    enabled: true
-    accessModes:
-      - ReadWriteOnce
-    size: 10Gi
-    finalizers:
-      - kubernetes.io/pvc-protection
-
-
 
 prometheus:
   forceNamespace: monitoring

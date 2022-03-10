@@ -1,2 +1,5 @@
 grafana:
-  adminUser: grafana-prod-env-noah
+  datasources:
+    secretName: prometheus-datasource
+  dashboardsProvider:
+    configMapName: default
