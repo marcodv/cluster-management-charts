@@ -41,18 +41,6 @@ metadata:
   labels:
     grafana_dashboard: "1"
   namespace: monitoring
-  name: aws-billing
-data:
-  aws-billing.json: |-
-{{ .Files.Get "dashboards/aws-billing.json" | indent 4 }}
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  labels:
-    grafana_dashboard: "1"
-  namespace: monitoring
   name: eks-volumes
 data:
   eks-volumes.json: |-
