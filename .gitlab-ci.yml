@@ -129,13 +129,16 @@ install-traefik:production-cluster:
 .install-monitoring:
   stage: monitoring
   extends: .connect-to-cluster 
-  script: 
+  script:
+    - GRAFANA_PASSWORD=$(aws secretsmanager get-secret-value --secret-id $GRAFANA_SECRET_ID | jq --raw-output '.SecretString' | jq -r .password)
+    - GRAFANA_USER=$(aws secretsmanager get-secret-value --secret-id $GRAFANA_SECRET_ID | jq --raw-output '.SecretString' | jq -r .username)
     - |
       helm upgrade --install monitoring \
         ./charts/monitoring \
         -f ${ENVIRONMENT_VALUES} \
-        --set grafana.adminPassword=${GRAFANA_PASSWORD}
-        # -n monitoring --create-namespace
+        --set grafana.admin.password=${GRAFANA_PASSWORD} \
+        --set grafana.admin.user=${GRAFANA_USER} \
+        -n monitoring --create-namespace
 
 install-monitoring:development-cluster:
   extends: .install-monitoring
@@ -144,13 +147,13 @@ install-monitoring:development-cluster:
     CLUSTER_NAME: eks-dev-env
     AWS_PROFILE: $TF_USER_DEV_ENV
     ENVIRONMENT_VALUES: ./charts/monitoring/values.development.yaml 
-    GRAFANA_PASSWORD: $GRAFANA_PASSWORD_DEV_ENV
+    GRAFANA_SECRET_ID: grafanaCredentialdevEnv
   rules: 
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
         - charts/monitoring/**/*
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED
-
+    - if: $CI_COMMIT_BRANCH == "14-create-grafana-folder-structure"
 
 install-monitoring:production-cluster:
   extends: .install-monitoring
@@ -158,7 +161,7 @@ install-monitoring:production-cluster:
     AWS_REGION: eu-west-1
     CLUSTER_NAME: eks-prod-env
     AWS_PROFILE: $TF_USER_PROD_ENV
-    GRAFANA_PASSWORD: $GRAFANA_PASSWORD_PROD_ENV
+    GRAFANA_SECRET_ID: grafanaCredentialprodEnv
     ENVIRONMENT_VALUES: ./charts/monitoring/values.production.yaml
   rules: 
     - if: $CI_COMMIT_BRANCH == "production"

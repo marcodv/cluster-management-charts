@@ -4,6 +4,5 @@ grafana:
     password: Marcotesting123
   datasources:
     secretName: prometheus-datasource
-  assumeRoleArn: arn:aws:iam::848481299679:role/grafanaRoledevEnv
   dashboardsProvider:
     configMapName: default
