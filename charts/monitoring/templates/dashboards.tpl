@@ -45,3 +45,27 @@ metadata:
 data:
   eks-volumes.json: |-
 {{ .Files.Get "dashboards/eks-volumes.json" | indent 4 }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    grafana_dashboard: "1"
+  namespace: monitoring
+  name: rds
+data:
+  rds.json: |-
+{{ .Files.Get "dashboards/rds.json" | indent 4 }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    grafana_dashboard: "1"
+  namespace: monitoring
+  name: elasticache
+data:
+  elasticache.json: |-
+{{ .Files.Get "dashboards/elasticache.json" | indent 4 }}

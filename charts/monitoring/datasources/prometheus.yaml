@@ -5,4 +5,11 @@ datasources:
     url: http://monitoring-prometheus-server.monitoring.svc.cluster.local
     access: proxy
     isDefault: true
-    
+  - name: CloudWatch
+    type: cloudwatch
+    jsonData:
+      authType: keys
+      defaultRegion: eu-west-1
+    secureJsonData:
+      accessKey: {{ $.Values.aws.accessKey }}
+      secretKey: {{ $.Values.aws.secretKey }}

@@ -69,6 +69,10 @@ grafana:
       fileName: rabbitmq.json
     - configMapName: eks-volumes
       fileName: eks-volumes.json
+    - configMapName: rds
+      fileName: rds.json
+    - configMapName: elasticache
+      fileName: elasticache.json
 
   persistence:
     enabled: true

@@ -3,3 +3,4 @@ grafana:
     secretName: prometheus-datasource
   dashboardsProvider:
     configMapName: default
+  grafanaRole: arn:aws:iam::848481299679:role/grafanaRoledprodEnv
