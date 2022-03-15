@@ -9,6 +9,8 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
     alb.ingress.kubernetes.io/load-balancer-name: alb-ingress-{{ .Values.ingress.clusterName }}
+    alb.ingress.kubernetes.io/certificate-arn: {{ join ", " .Values.ingress.certificateArns }}
+    external-dns.alpha.kubernetes.io/hostname: {{ join ", " .Values.ingress.hostnames }}
 spec:
   rules:
     - http:

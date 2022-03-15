@@ -1,6 +1,10 @@
 ingress:
   annotations:
     alb.ingress.kubernetes.io/tags: Environment=dev
-    external-dns.alpha.kubernetes.io/hostname: dev.api.noah.energy, staging.api.noah.energy
   clusterName: eks-dev-env
+  hostnames:
+    - dev.api.noahdev.org
+    - staging.api.noahdev.org
+    - dev-monitoring.noahdev.org
+    - dev-cluster.noahdev.org
 

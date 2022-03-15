@@ -62,6 +62,7 @@ install-aws-load-balancer-controller:production-cluster:
     - |
       helm upgrade --install external-dns \
         ./charts/external-dns \
+        -f ${ENVIRONMENT_VALUES} \
         -n kube-system 
 
 install-external-dns:development-cluster:
@@ -70,6 +71,7 @@ install-external-dns:development-cluster:
     AWS_REGION: eu-west-1
     CLUSTER_NAME: eks-dev-env
     AWS_PROFILE: $TF_USER_DEV_ENV
+    ENVIRONMENT_VALUES: ./charts/external-dns/values.development.yaml
   rules: 
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
@@ -83,6 +85,7 @@ install-external-dns:production-cluster:
     AWS_REGION: eu-west-1
     CLUSTER_NAME: eks-prod-env
     AWS_PROFILE: $TF_USER_PROD_ENV
+    ENVIRONMENT_VALUES: ./charts/external-dns/values.production.yaml
   rules: 
     - if: $CI_COMMIT_BRANCH == "production"
       changes:

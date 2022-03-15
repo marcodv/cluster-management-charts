@@ -1,3 +1,5 @@
+ingressRoute:
+  rule: "Host(`dev-monitoring.noah.energy`) || Host(`dev-monitoring.noahdev.org`)"
 grafana:
   datasources:
     secretName: prometheus-datasource

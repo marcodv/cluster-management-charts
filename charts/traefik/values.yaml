@@ -6,7 +6,6 @@ ingress:
     alb.ingress.kubernetes.io/scheme: internet-facing
 
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:848481299679:certificate/74d36e22-cc38-49eb-b07d-43437e2e21b8, arn:aws:acm:eu-west-1:848481299679:certificate/5ff2059c-cc12-455d-96e2-bc90f290cf2d
     alb.ingress.kubernetes.io/ssl-redirect: '443'
 
     # alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
@@ -15,10 +14,18 @@ ingress:
 
     alb.ingress.kubernetes.io/tags: 
   clusterName: 
+  certificateArns: 
+    - arn:aws:acm:eu-west-1:848481299679:certificate/74d36e22-cc38-49eb-b07d-43437e2e21b8
+    - arn:aws:acm:eu-west-1:848481299679:certificate/5ff2059c-cc12-455d-96e2-bc90f290cf2d
+    - arn:aws:acm:eu-west-1:848481299679:certificate/947569cb-b96f-4e84-8267-09ce898a1d3d
+    - arn:aws:acm:eu-west-1:848481299679:certificate/ab464aac-5926-45d6-a061-c7edd003c652 
+  hostnames: 
+    - noah.energy
+
 
 whoami:
-  enabled: true
-  # enabled: false
+  # enabled: true
+  enabled: false
 
 traefik:
   # Default values for Traefik
