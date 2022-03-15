@@ -1,0 +1,18 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: monitor-route
+  # namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+
+spec:
+  entryPoints:
+    - web
+
+  routes:
+    - match: {{ .Values.ingressRoute.rule }}
+      kind: Rule
+      services:
+      - name: monitoring-grafana
+        port: 3000

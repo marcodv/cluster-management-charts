@@ -1,0 +1,2 @@
+external-dns:
+  txtPrefix: "prefixdevcluster.donotclashwithcname."
