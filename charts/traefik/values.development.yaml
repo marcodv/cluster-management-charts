@@ -3,8 +3,9 @@ ingress:
     alb.ingress.kubernetes.io/tags: Environment=dev
   clusterName: eks-dev-env
   hostnames:
-    - dev.api.noahdev.org
-    - staging.api.noahdev.org
     - dev-monitoring.noahdev.org
     - dev-cluster.noahdev.org
 
+traefik:
+  deployment:
+    replicas: 1

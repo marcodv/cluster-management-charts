@@ -4,6 +4,11 @@ ingress:
   clusterName: eks-prod-env
   hostnames:
     - api.noahdev.org
-    - noahdev.org
+    - dev.api.noahdev.org
+    - staging.api.noahdev.org
     - monitoring.noahdev.org
     - prod-cluster.noahdev.org
+
+traefik:
+  deployment:
+    replicas: 3
