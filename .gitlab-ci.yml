@@ -135,8 +135,8 @@ install-traefik:production-cluster:
   script:
     - GRAFANA_PASSWORD=$(aws secretsmanager get-secret-value --secret-id $GRAFANA_SECRET_ID | jq --raw-output '.SecretString' | jq -r .password)
     - GRAFANA_USER=$(aws secretsmanager get-secret-value --secret-id $GRAFANA_SECRET_ID | jq --raw-output '.SecretString' | jq -r .username)
-    - GRAFANA_AWS_ACCESS_KEY_ID=$(aws secretsmanager get-secret-value --secret-id $GRAFANA_AWS_ACCOUNT | jq --raw-output '.SecretString' | jq -r .aws_access_key_id)
-    - GRAFANA_AWS_SECRET_KEY=$(aws secretsmanager get-secret-value --secret-id $GRAFANA_AWS_ACCOUNT | jq --raw-output '.SecretString' | jq -r .aws_secret_access_key)
+    - GRAFANA_AWS_ACCESS_KEY_ID=$(aws secretsmanager get-secret-value --secret-id $GRAFANA_SECRET_ID | jq --raw-output '.SecretString' | jq -r .aws_access_key_id)
+    - GRAFANA_AWS_SECRET_KEY=$(aws secretsmanager get-secret-value --secret-id $GRAFANA_SECRET_ID | jq --raw-output '.SecretString' | jq -r .aws_secret_access_key)
     - |
       helm upgrade --install monitoring \
         ./charts/monitoring \
@@ -155,7 +155,6 @@ install-monitoring:development-cluster:
     AWS_PROFILE: $TF_USER_DEV_ENV
     ENVIRONMENT_VALUES: ./charts/monitoring/values.development.yaml 
     GRAFANA_SECRET_ID: grafanaCredentialdevEnv
-    GRAFANA_AWS_ACCOUNT: grafanaAwsKeydevEnv
   rules: 
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
@@ -169,7 +168,6 @@ install-monitoring:production-cluster:
     CLUSTER_NAME: eks-prod-env
     AWS_PROFILE: $TF_USER_PROD_ENV
     GRAFANA_SECRET_ID: grafanaCredentialprodEnv
-    GRAFANA_AWS_ACCOUNT: grafanaAwsKeyprodEnv
     ENVIRONMENT_VALUES: ./charts/monitoring/values.production.yaml
   rules: 
     - if: $CI_COMMIT_BRANCH == "production"
