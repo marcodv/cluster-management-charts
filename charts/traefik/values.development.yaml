@@ -5,7 +5,10 @@ ingress:
   hostnames:
     - dev-monitoring.noahdev.org
     - dev-cluster.noahdev.org
+    - whoami.noahdev.org
 
+whoami:
+  enabled: true
 traefik:
   deployment:
     replicas: 1

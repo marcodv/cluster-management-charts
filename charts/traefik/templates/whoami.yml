@@ -45,13 +45,13 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: myingressroute
+  name: whoami-ingressroute
 spec:
   entryPoints:
     - web
 
   routes:
-  - match:  PathPrefix(`/whoami`)
+  - match:  Host(`whoami.noahdev.org`) 
     kind: Rule
     services:
     - name: whoami
