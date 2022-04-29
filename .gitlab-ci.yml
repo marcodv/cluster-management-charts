@@ -17,6 +17,9 @@ stages:
   before_script:
     - aws sts get-caller-identity
     - aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
+  tags:
+    - prod
+    - cluster_mgmt_chart
 
 .install-aws-load-balancer-controller:
   stage: setup
@@ -39,7 +42,7 @@ install-aws-load-balancer-controller:development-cluster:
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
         - charts/aws-load-balancer-controller/**/*
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED 
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED
 
 
 install-aws-load-balancer-controller:production-cluster:
@@ -54,6 +57,9 @@ install-aws-load-balancer-controller:production-cluster:
       changes:
         - charts/aws-load-balancer-controller/**/*
     - if: $CI_COMMIT_BRANCH == "production" && $CI_PIPELINE_TRIGGERED
+  tags:
+    - prod
+    - cluster_mgmt_chart
 
 .install-external-dns:
   stage: setup
@@ -76,8 +82,7 @@ install-external-dns:development-cluster:
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
         - charts/external-dns/**/*
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED 
-
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED
 
 install-external-dns:production-cluster:
   extends: .install-external-dns
@@ -91,6 +96,9 @@ install-external-dns:production-cluster:
       changes:
         - charts/external-dns/**/*
     - if: $CI_COMMIT_BRANCH == "production" && $CI_PIPELINE_TRIGGERED
+  tags:
+    - prod
+    - cluster_mgmt_chart
 
 .install-traefik:
   stage: networking
@@ -115,7 +123,6 @@ install-traefik:development-cluster:
         - charts/traefik/**/*
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED
 
-
 install-traefik:production-cluster:
   extends: .install-traefik
   variables:
@@ -128,6 +135,9 @@ install-traefik:production-cluster:
       changes:
         - charts/traefik/**/*
     - if: $CI_COMMIT_BRANCH == "production" && $CI_PIPELINE_TRIGGERED
+  tags:
+    - prod
+    - cluster_mgmt_chart
 
 .install-monitoring:
   stage: monitoring
@@ -174,3 +184,6 @@ install-monitoring:production-cluster:
       changes:
         - charts/monitoring/**/*
     - if: $CI_COMMIT_BRANCH == "production" && $CI_PIPELINE_TRIGGERED
+  tags:
+    - prod
+    - cluster_mgmt_chart
